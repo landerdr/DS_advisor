@@ -18,6 +18,19 @@ services:
     depends_on:
       - db
 
+  dlproxy:
+    build:
+      context: services/dlproxy
+      dockerfile: Dockerfile
+    volumes:
+      - "./services/dlproxy:/usr/src/app"
+    ports:
+      - 5002:5000
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=config.DevelopmentConfig
+
+
   vehicles:
     build:
       context: services/vehicles
@@ -25,7 +38,7 @@ services:
     volumes:
       - "./services/vehicles:/usr/src/app"
     ports:
-      - 5002:5000
+      - 5003:5000
     environment:
       - FLASK_ENV=development
       - APP_SETTINGS=project.config.DevelopmentConfig
@@ -35,10 +48,29 @@ services:
     depends_on:
       - db
 
+  stops:
+    build:
+      context: services/stops
+      dockerfile: Dockerfile
+    volumes:
+      - "./services/stops:/usr/src/app"
+    ports:
+      - 5004:5000
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/users_dev
+      - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/users_test
+    depends_on:
+      - db
+      - dlproxy
+
   db:
     build:
       context: ./services/db
       dockerfile: Dockerfile
+    volumes:
+      - "./services/db:/usr/src/app"
     ports:
       - 5435:5432
     environment:
@@ -60,3 +92,5 @@ services:
     depends_on:
       - users
       - vehicles
+      - stops
+      - dlproxy
