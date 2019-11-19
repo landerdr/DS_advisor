@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>DeLijn - Home</title>
+    <title>DeLijn - Stops</title>
     <meta name='viewport' content='initial-scale=1.0 maximum-scale=1.0'>
 
     <!-- Bootstrap CSS -->
@@ -39,10 +39,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="/stops">Stops</a>
             </li>
             <li class="nav-item">
@@ -55,6 +55,26 @@
     </div>
 </nav>
 <div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h1>Select</h1>
+        </div>
+        <div class="col-6">
+            <h1>Rate</h1>
+            <form id="rateStop">
+                <input name="email" class="form-control" type="email" placeholder="Email" required>
+                <input name="password" class="form-control" type="text" placeholder="Password" required>
+                <input name="rating" class="form-control" type="number" min="0" max="5" placeholder="Rating" required>
+                <input type="submit" class="btn btn-primary" value="Submit">
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h1>Ratings</h1>
+        </div>
+    </div>
+
 </div>
 </body>
 

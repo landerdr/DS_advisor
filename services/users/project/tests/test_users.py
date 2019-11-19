@@ -26,7 +26,8 @@ class TestUserService(BaseTestCase):
                 "/users",
                 data=json.dumps({
                     "username": "michael",
-                    "email": "michael@mherman.org"
+                    "email": "michael@mherman.org",
+                    "password": "test"
                 }),
                 content_type="application/json",
             )
@@ -68,7 +69,8 @@ class TestUserService(BaseTestCase):
                 "/users",
                 data=json.dumps({
                     "username": "micheal",
-                    "email": "michael@mherman.org"
+                    "email": "michael@mherman.org",
+                    "password": "test"
                 }),
                 content_type="application/json",
             )
@@ -76,7 +78,8 @@ class TestUserService(BaseTestCase):
                 "/users",
                 data=json.dumps({
                     "username": "micheal",
-                    "email": "michael@mherman.org"
+                    "email": "michael@mherman.org",
+                    "password": "test"
                 }),
                 content_type="application/json",
             )
@@ -87,7 +90,7 @@ class TestUserService(BaseTestCase):
 
     def test_single_user(self):
         """Ensure get single user behaves correctly."""
-        user = User(username="michael", email="michael@mherman.org")
+        user = User(username="michael", email="michael@mherman.org", password="test")
         db.session.add(user)
         db.session.commit()
         with self.client:

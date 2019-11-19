@@ -18,6 +18,23 @@ services:
     depends_on:
       - db
 
+  vehicles:
+    build:
+      context: services/vehicles
+      dockerfile: Dockerfile
+    volumes:
+      - "./services/vehicles:/usr/src/app"
+    ports:
+      - 5002:5000
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/users_dev
+      - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/users_test
+
+    depends_on:
+      - db
+
   db:
     build:
       context: ./services/db
@@ -32,6 +49,8 @@ services:
     build:
       context: ./services/Web-UI
       dockerfile: Dockerfile
+    volumes:
+      - "./services/Web-UI:/usr/src/app"
     ports:
       - 5000:5000
     environment:
@@ -40,3 +59,4 @@ services:
 
     depends_on:
       - users
+      - vehicles
