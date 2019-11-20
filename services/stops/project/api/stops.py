@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-# import requests
 from sqlalchemy import exc
 from project.api.models import StopRatings
 from project import db
@@ -32,14 +31,14 @@ def add_stop_rating():
                                            user_id=r["data"]["id"]).first()
         if not rate:
             db.session.add(
-                StopRatings(entity_number=entity_number, line_number=stop_number, user_id=r["data"]["id"],
+                StopRatings(entity_number=entity_number, stop_number=stop_number, user_id=r["data"]["id"],
                             rating=int(rating)))
         else:
             rate.rating = int(rating)
         db.session.commit()
         response_object = {
             "status": "success",
-            "message": "Rating was added for %d %d" % (entity_number, stop_number)
+            "message": "Rating was added for %d %d" % (int(entity_number), int(stop_number))
         }
         return jsonify(response_object), 201
     except exc.IntegrityError as e:
@@ -75,7 +74,7 @@ def delete_stop_rating():
         db.session.commit()
         response_object = {
             "status": "success",
-            "message": "Rating was removed for %d %d" % (entity_number, stop_number)
+            "message": "Rating was removed for %d %d" % (int(entity_number), int(stop_number))
         }
         return jsonify(response_object), 201
     except exc.IntegrityError as e:
@@ -85,27 +84,23 @@ def delete_stop_rating():
 
 @stops_blueprint.route("/stop/<entity_number>/<stop_number>", methods=["GET"])
 def get_single_vehicle(entity_number, stop_number):
-    response_object = {"status": "fail", "message": "Line does not exist."}
+    response_object = {"status": "fail", "message": "Stop does not exist."}
     try:
-        v = 0
-        if not v:
-            return jsonify(response_object), 404
-        else:
-            ratings = StopRatings.query.filter_by(entity_number=int(entity_number), line_number=int(stop_number))
-            avg = 0
-            if ratings.count() != 0:
-                for r in ratings:
-                    avg += r.rating
-                avg /= ratings.count()
-            response_object = {
-                "status": "success",
-                "data": {
-                    "entity_number": int(entity_number),
-                    "stop_number": int(stop_number),
-                    "ratings": [r.rating for r in ratings],
-                    "avg_rating": avg
-                }
+        ratings = StopRatings.query.filter_by(entity_number=int(entity_number), stop_number=int(stop_number))
+        avg = 0
+        if ratings.count() != 0:
+            for r in ratings:
+                avg += r.rating
+            avg /= ratings.count()
+        response_object = {
+            "status": "success",
+            "data": {
+                "entity_number": int(entity_number),
+                "stop_number": int(stop_number),
+                "ratings": [r.rating for r in ratings],
+                "avg_rating": avg
             }
-            return jsonify(response_object), 200
+        }
+        return jsonify(response_object), 200
     except ValueError:
         return jsonify(response_object), 404

@@ -43,3 +43,23 @@ def delete_vehicle_rating():
     post_data = request.get_json()
     response = requests.delete("http://vehicles:5000/vehicle/rate", json=post_data)
     return json.loads(response.content), response.status_code
+
+
+@api_blueprint.route("/stop/<entity_number>/<stop_number>", methods=["GET"])
+def get_stop_info(entity_number, stop_number):
+    response = requests.get("http://stops:5000/stop/%d/%d" % (int(entity_number), int(stop_number)))
+    return json.loads(response.content), response.status_code
+
+
+@api_blueprint.route("/stop/rate", methods=["POST"])
+def rate_stop():
+    post_data = request.get_json()
+    response = requests.post("http://stops:5000/stop/rate", json=post_data)
+    return json.loads(response.content), response.status_code
+
+
+@api_blueprint.route("/stop/rate", methods=["DELETE"])
+def delete_stop_rating():
+    post_data = request.get_json()
+    response = requests.delete("http://stops:5000/stop/rate", json=post_data)
+    return json.loads(response.content), response.status_code
