@@ -27,5 +27,9 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-# Run site
-docker-compose -f ./docker-compose-dev.yml up --build
+# Create containers and run
+sudo docker-compose -f ./docker-compose-dev.yml up -d --build
+# Create database tables
+sudo docker-compose -f ./docker-compose-dev.yml run vehicles python manage.py recreate-db
+# Open webbrowser
+xdg-open http://127.0.0.1:5000
