@@ -55,6 +55,363 @@
     </div>
 </nav>
 <div class="container">
+    <h1>Architecture</h1>
+    <p>In this section we will briefly go over the architecture of the project and the functionality of each of the
+        services that are implemented. In the next section we will talk about the design chooses we made and explain
+        them a bit more.</p>
+    <p>The project consists of six microservices, each using their own docker container, each of these microservices
+        handles their own unique features. The microservices consist of a database service, user service, vehicle
+        service, stop service, delijn proxy service and web-ui service. </p>
+    <img src="/static/Diagram.png">
+
+
+    <h3>Database service</h3>
+    <p>The database handles all persistent storage for the site, we chose for a single pSQL database to make sure the
+        integrity of the database was kept, while it is possible to separate the database into multiple segments, each
+        serving one service, the added complexity to keep the integrity wasn’t worth the effort for this project. The
+        downside of this approach is when we need to update the database, all services will be down, since they all
+        depend on this one database.</p>
+    <div class="alert alert-warning" role="alert">Please note that running install.sh will reset the database, so if you
+        want to retain the data between sessions you need to run the docker compose command manually.
+    </div>
+    <h3>User service</h3>
+    <p>The user service is responsible for the management of the users, it handles the creation and authentication. The
+        user service is dependent on the database to store the user data. Currently user passwords get stored in plain
+        text but this could be easily changed to allow for an encryption, however if we run the site on https the API
+        calls will be encrypted, and because the database isn’t directly accessible from the web this should be fine for
+        this project, ofc if we were to release this in a production environment we would want to have encryption.</p>
+    <h3>Vehicle service</h3>
+    <p>The vehicle service manages the vehicles and vehicle ratings, it supports creation/deletion of vehicles and
+        creation/deletion/changing of vehicle ratings. It stores the vehicle data inside the database and checks with
+        the user service if the credentials are correct.</p>
+    <h3>Stop service</h3>
+    <p>The stop service manages the stop ratings, it supports creation/deletion/changing of vehicle ratings. It stores
+        the vehicle data inside the database and checks with the user service if the credentials are correct. It doesn’t
+        check if the stop exists, while this could be a valid addition I chose to not implement it in this project.</p>
+    <h3>De Lijn proxy service</h3>
+    <p>This service is just a proxy between our webapp and the De Lijn's api, by doing this we can control the return
+        format we get and don’t need to change everything around when DL decides to change their api. We also added
+        caching to this service to speed up the site, since DL's api is still very slow. Again the cache doesn't have
+        auto renewal, but this should be fairly straightforward to add.</p>
+    <h3>Web-UI service</h3>
+    <p>This service is responsible for serving the content to the users. I chose to only let users interact with this
+        service, with the main reason being that it increases the security of the project. Since it acts as a proxy for
+        all the calls, we can hide all the other services behind a firewall, which means that getting access to the
+        system is harder, since they won't have direct access to any of the user data stored in the database. This will
+        also keep all endpoints addressable even when we are doing maintenance on other services.</p>
+    <hr>
+    <h1>Design choices</h1>
+    <p>Most of the design choices we already covered in previous part, however I will briefly go over some of the
+        endpoints that exist. Because there are too many endpoints to list them all I will focus on the endpoints that
+        are accessible to the user, which are the ones from the Web-UI service.</p>
+    <h3>API endpoints</h3>
+    <div class="accordion" id="apis">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
+                            aria-expanded="true" aria-controls="collapseOne">
+                        <span class="badge badge-info">POST</span> /register
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Creates new user if email isn't in use already.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "email": string,
+        "username": string,
+        "password": string
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingTwo">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <span class="badge badge-info">POST</span> /vehicle
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Creates new vehicle if it doesn't already exist.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "email": string,
+        "password": string,
+        "entity_number": int,
+        "vehicle_number": int,
+        "vehicle_type": int
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingThree">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        <span class="badge badge-danger">DELETE</span> /vehicle
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Deletes vehicle if exists and it doesn't have any ratings.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "vehicle_id": int,
+        "email": string,
+        "password": string
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFour">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        <span class="badge badge-secondary">GET</span> /vehicle/&lt;vehicle_id&gt;
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Gets vehicle data if exists.
+                    </div>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "data": {
+            "id": int,
+            "entity_number": int,
+            "vehicle_number": int,
+            "vehicle_type": int,
+            "ratings": [int],
+            "avg_rating": float
+        }
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFive">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                        <span class="badge badge-info">POST</span> /vehicle/rate
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Creates new vehicle rating if vehicle exists, if vehicle rating already exists changes it.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "vehicle_id": int,
+        "email": string,
+        "password": string,
+        "rating": int
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingSix">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                        <span class="badge badge-danger">DELETE</span> /vehicle/rate
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Deletes vehicle rating if exists.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "vehicle_id": int,
+        "email": string,
+        "password": string
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingSeven">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                        <span class="badge badge-secondary">GET</span> /stop/&lt;entity_number&gt;/&lt;stop_number&gt;
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Gets stop data if exists.
+                    </div>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "data": {
+            "entity_number": int,
+            "stop_number": int,
+            "ratings": [int],
+            "avg_rating": float
+        }
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingEight">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                        <span class="badge badge-info">POST</span> /stop/rate
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseEight" class="collapse" aria-labelledby="headingEight" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Creates new stop rating, if stop rating already exists changes it.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "entity_number": int,
+        "stop_number": int,
+        "email": string,
+        "password": string,
+        "rating": int
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingNine">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+                        <span class="badge badge-danger">DELETE</span> /stop/rate
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseNine" class="collapse" aria-labelledby="headingNine" data-parent="#apis">
+                <div class="card-body">
+                    <div class="alert alert-secondary">
+                        Deletes stop rating if exists.
+                    </div>
+                    <span>Request data</span>
+                    <pre><code>
+    {
+        "entity_number": int,
+        "stop_number": int,
+        "email": string,
+        "password": string
+    }
+                        </code></pre>
+                    <span>Response data</span>
+                    <pre><code>
+    {
+        "status": string,
+        "message": string
+    }
+                        </code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <h1>Functionality</h1>
+    <p>You can navigate to the pages that correspond with each service, loading the stops might take a while since it
+        needs to request and cache data from De Lijn.</p>
+    <hr>
+    <h1>Dependencies</h1>
+    <h3>Public transport data</h3>
+    <p>For the data on the public transport we use the api from DeLijn, which can be found <a
+            href="https://data.delijn.be">here</a>.</p>
+    <h3>Docker</h3>
+    <p>The project makes use of <a href="https://www.docker.com/">docker</a> to run all of the microservices.</p>
+    <h3>Functional</h3>
+    <p>The backend is coded in Python v3.x, using the libraries Flask, Jinja2, Flask-SQLAlchemy and requirements.</p>
+    <p>The front end has been coded in HTML and JavaScript, we are using BootStrap v4 for the layout and the
+        library JQuery for the functionality.</p>
 </div>
 </body>
 

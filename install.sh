@@ -27,6 +27,11 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
+# chmod all the things
+chmod 777 ./services/vehicles/entrypoint.sh
+chmod 777 ./services/stops/entrypoint.sh
+chmod 777 ./services/users/entrypoint.sh
+
 # Create containers and run
 sudo docker-compose -f ./docker-compose-dev.yml up -d --build
 # Create database tables
