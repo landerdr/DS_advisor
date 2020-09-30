@@ -68,7 +68,7 @@
         <div class="col-6">
             <h1>Select</h1>
             <select class="form-control selectpicker" id="select-vehicle" data-live-search="true">
-                <option selected>Please select a stop</option>
+                <option selected>Please select a vehicle</option>
                 {% for vehicle in vehicles['data'] %}
                 <option id="{{vehicle['id']}}" >
                     {{ types[vehicle['vehicle_type']] }}: {{ vehicle['entity_number'] }} - {{ vehicle['vehicle_number'] }}
@@ -78,7 +78,7 @@
             <div id="vehicle_info">Vehicle info</div>
         </div>
         <div class="col-6">
-            <h1>Rate</h1>
+            <h1>Add vehicle rating</h1>
             <form id="rateVehicle">
                 <input name="email" class="form-control" type="email" placeholder="Email" required>
                 <input name="password" class="form-control" type="text" placeholder="Password" required>

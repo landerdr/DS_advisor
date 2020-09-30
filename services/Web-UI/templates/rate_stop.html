@@ -59,30 +59,38 @@
 <div class="container">
     <div class="row">
         <div class="col-6">
-            <h1>All stops</h1>
-            <a href="/stops/all">Click here</a>
-            <h1>Stops based on town</h1>
-            <select class="form-control selectpicker" id="select-town" data-live-search="true">
-                <option selected>Please select a town</option>
-                {% for town in towns['data'] %}
-                <option town_id="{{town['id']}}">
-                    {{ town['town'] }}
+            <h1>Select</h1>
+            <select class="form-control selectpicker" id="select-stop" data-live-search="true">
+                <option selected>Please select a stop</option>
+                {% for stop in stops['data'] %}
+                <option entity_number="{{stop['entity_number']}}" stop_number="{{stop['stop_number']}}">
+                    {{ stop['entity_number'] }} - {{ stop['stop_number'] }}
                 </option>
                 {% endfor %}
             </select>
-            <button class="btn btn-primary" id="townstops">Proceed</button>
-            <h1>Stops based on line</h1>
-            <select class="form-control selectpicker" id="select-line" data-live-search="true">
-                <option selected>Please select a line</option>
-                {% for line in lines['data'] %}
-                <option entity_number="{{line['entity_number']}}" line_number="{{line['line_number']}}">
-                    {{ line['description'] }}
-                </option>
-                {% endfor %}
-            </select>
-            <button class="btn btn-primary" id="linestops">Proceed</button>
+            <div id="stop_info">Stop info</div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-6">
+            <h1>Add stop rating</h1>
+            <form id="rateStop">
+                <input name="email" class="form-control" type="email" placeholder="Email" required>
+                <input name="password" class="form-control" type="text" placeholder="Password" required>
+                <input name="rating" class="form-control" type="number" min="0" max="5" placeholder="Rating" required>
+                <input type="submit" class="btn btn-primary" value="Submit">
+            </form>
+        </div>
+        <div class="col-6">
+            <h1>Delete stop rating</h1>
+            <form id="deleteStopRating">
+                <input name="email" class="form-control" type="email" placeholder="Email" required>
+                <input name="password" class="form-control" type="text" placeholder="Password" required>
+                <input type="submit" class="btn btn-primary" value="Submit">
+            </form>
+        </div>
+    </div>
+
 </div>
 </body>
 
