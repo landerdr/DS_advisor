@@ -18,8 +18,8 @@ def create_app(script_info=None):
     db.init_app(app)
 
     # register blueprints
-    from project.api.lines import lines_blueprint
-    app.register_blueprint(lines_blueprint)
+    from project.api.stops import stops_blueprint
+    app.register_blueprint(stops_blueprint)
 
     # shell context for flask cli
     @app.shell_context_processor

@@ -176,7 +176,7 @@ def delete_vehicle():
             r = response.json()
             rate = VehicleRatings.query.filter_by(id=vehicle_id)
             if not rate.count() == 0:
-                response_object["message"] = "Can't remove stop that has ratings"
+                response_object["message"] = "Can't remove vehicle that has ratings"
                 return jsonify(response_object), 401
             vehicle = Vehicle.query.filter_by(id=vehicle_id, created_id=r["data"]["id"]).first()
             if not vehicle:
