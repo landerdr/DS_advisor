@@ -1,5 +1,5 @@
 # DS_advisor
- Distributed system: assignement2: microservices
+ Distributed system: assignment 2: microservices
 
 To run the project simply run the installer script.
 ```
